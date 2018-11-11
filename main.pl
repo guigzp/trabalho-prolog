@@ -318,13 +318,45 @@ doenca('Febre Amarela', A):-
     member('olhos amarelados', A),
     member('pele amarelada', A),!.
 
+doenca('TESTE', A):-
+    member('febre', A),
+    member('fadiga', A),
+    member('nausea', A),!.
 
 
+menu :- write('\ntestando menu \n'),
+        write('1. abc'), nl,
+        write('2. adddd'), nl,
+        write('0. sair'), nl,
+        read(Opcao),
+        gestorMenu(Opcao).
 
+gestorMenu(Opcao) :- Opcao == 1, abc, menu;
+                     Opcao == 2, aaa, menu;
+                     Opcao == 3, verDiag, menu;
+                     Opcao == 0, true.
 
+abc :- write('vini gay').
 
+aaa :- open('texto.txt', append, Stream),
+       write(Stream, 'teste'), nl(Stream),
+       close(Stream).
 
+verDiag :-
+    exists_file('texto.txt'),
+    open('texto.txt', read, X),
+    ler_do_arquivo(X, Lista),
+    select('end_of_file', Lista, R),
+    doenca(Y, R),
+    write(Y),
+    close(X),!.
 
+ler_do_arquivo(Stream, []):-
+  at_end_of_stream(Stream), !.
+
+ler_do_arquivo(Stream, [X|L]):-
+  !, read(Stream, X),
+  ler_do_arquivo(Stream, L).
 
 
 
