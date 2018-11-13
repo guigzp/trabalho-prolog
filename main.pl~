@@ -3,7 +3,7 @@ sintoma('diarreia').
 sintoma('vomito').
 sintoma('pouco apetite').
 sintoma('garganta inflamada').
-sintome('dor de cabeca').
+sintoma('dor de cabeca').
 sintoma('dor generalizada').
 sintoma('dor nas costas').
 sintoma('hemorragia').
@@ -16,7 +16,6 @@ sintoma('fadiga').
 sintoma('perda de peso').
 sintoma('dor no peito').
 sintoma('suor excessivo').
-
 
 doenca('Dengue Hemorragica', A):-
     member('hemorragia', A),
@@ -47,3 +46,30 @@ doenca('Pneumonia', A):-
     member('febre', A),
     member('suor excessivo', A),
     member('dificuldade respiratoria',A).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

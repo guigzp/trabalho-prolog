@@ -3,7 +3,7 @@ sintoma('diarreia').
 sintoma('vomito').
 sintoma('pouco apetite').
 sintoma('garganta inflamada').
-sintome('dor de cabeca').
+sintoma('dor de cabeca').
 sintoma('dor generalizada').
 sintoma('dor nas costas').
 sintoma('hemorragia').
