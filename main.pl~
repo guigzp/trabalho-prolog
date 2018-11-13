@@ -336,7 +336,7 @@ gestorMenu(Opcao) :- Opcao == 1, abc, menu;
                      Opcao == 3, verDiag, menu;
                      Opcao == 0, true.
 
-abc :- sintoma(X),
+abc :- X = sintoma(_),
     write(sintoma(X)).
 
 aaa :- open('texto.txt', append, Stream),
