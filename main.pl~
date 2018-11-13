@@ -324,25 +324,31 @@ doenca('TESTE', A):-
     member('nausea', A),!.
 
 
-menu :- write('\nMenu Diagnosticos \n'),
+menu :- write('\n-- Menu Diagnosticos -- \n\n'),
         write('1. Listar Sintomas'), nl,
-        write('2. adddd'), nl,
+        write('2. Escrever Sintoma'), nl,
+        write('3. Ver Diagnostico'), nl,
         write('0. sair'), nl,
         read(Opcao),
         gestorMenu(Opcao).
 
-gestorMenu(Opcao) :- Opcao == 1, abc, menu;
-                     Opcao == 2, aaa, menu;
+gestorMenu(Opcao) :- Opcao == 1, printSintomas, menu;
+                     Opcao == 2, anotaSintoma, menu;
                      Opcao == 3, verDiag, menu;
                      Opcao == 0, true.
 
-abc :- X = sintoma(_),
-    write(sintoma(X)).
+printSintomas:-       %%Printa todos os sintomas da forma 'Sintoma: febre'
+    forall(sintoma(X), format('Sintoma: ~w ~n', [X])).
 
-aaa :- open('texto.txt', append, Stream),
-       write('Digite seu sintoma: '),
-       write(Stream, 'teste'), nl(Stream),
-       close(Stream).
+anotaSintoma :-
+       open('texto.txt', append, Stream),   %%Modifiquei a funcao de
+       write('Digite seu sintoma: '),       %%escrever no arquivo, notei que
+       read(X),                             %%para ser escrito precisa colocar da
+       escreveArq(X, Stream).               %%forma, 'sintoma'.
+                                            %%Depois da modificação, é possivel
+escreveArq(X, Stream):-                     %%escrever qualquer sintoma no arquivo
+    write(Stream, X), nl(Stream),           %%porem ainda sem as aspas simples e
+    close(Stream).                          %%ponto final, apenas a String em si.
 
 verDiag :-
     exists_file('texto.txt'),
