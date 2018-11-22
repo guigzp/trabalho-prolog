@@ -360,22 +360,31 @@ doenca('Febre Amarela', A):-
 doenca('Virose', _).
 
 menu :- write('\n-- Menu Diagnosticos -- \n\n'),
+        write('0. Sair'), nl,
         write('1. Listar Sintomas'), nl,
         write('2. Nova consulta'), nl,
         write('3. Adicionar Sintomas consulta atual'), nl,
         write('4. Mostrar sintomas da consulta atual'), nl,
         write('5. Ver Diagnostico'), nl,
-        write('6. Ver Diagnostico por arquivo txt'), nl,
-        write('0. sair'), nl,
+        write('6. Mostrar pacientes cadastrados'), nl,
+        write('7. Remover sintomas paciente'), nl,
+        write('8. Remover paciente'), nl,
+        write('9. Ver Diagnostico por arquivo txt'), nl,
+        write('10. Exportar paciente para arquivo txt'), nl,
         read(Opcao),
         gestorMenu(Opcao).
 
+
 gestorMenu(Opcao) :- Opcao == 1, printSintomas, menu;
                      Opcao == 2, novaConsulta, menu;
-                     Opcao == 3, pedeNomePacienteAdicionar, menu;
+                     Opcao == 3, pedeNomeAdicionarSintoma, menu;
                      Opcao == 4, verSintomasAdicionados, menu;
                      Opcao == 5, verDiag, menu;
-                     Opcao == 6, mostraConsultaTxt, menu;
+                     Opcao == 6, mostraPacientes, menu;
+                     Opcao == 7, pedeNomeRemoverSintoma, menu;
+                     Opcao == 8, removerPaciente, menu;
+                     Opcao == 9, mostraConsultaTxt, menu;
+                     Opcao == 10, exportaPaciente, menu;
                      Opcao == 0, true.
 
 
@@ -391,10 +400,25 @@ verSintomasAdicionados:-
     findall(Y, consulta(X,Y), Z),
     write(Z).
 
-pedeNomePacienteAdicionar:-
+removerPaciente:-
     write("Digite o nome do paciente: "),
     read(X),
-    anotaSintoma(X).
+    paciente(X),
+    retract(paciente(X)),
+    write("Paciente removido com sucesso!");
+    write("Paciente não cadastrado").
+
+mostraPacientes:-
+    write("Pacientes cadastrados: "),
+    findall(Y, paciente(Y), Z),
+    printaList(Z).
+
+pedeNomeAdicionarSintoma:-
+    write("Digite o nome do paciente: "),
+    read(X),
+    paciente(X),
+    anotaSintoma(X);
+    write("Paciente nao cadastrado!").
 
 anotaSintoma(X):-
     write("Digite o seu sintoma: "),
@@ -405,13 +429,31 @@ anotaSintoma(X):-
     Z == 0, !;
     anotaSintoma(X).
 
+pedeNomeRemoverSintoma:-
+    write("Digite o nome do paciente: "),
+    read(X),
+    paciente(X),
+    removeSintoma(X);
+    write("Paciente nao cadastrado!").
+
+removeSintoma(X):-
+    write("Digite o sintoma a ser removido: "),
+    read(Y),
+    retract(consulta(X,Y)),
+    write("Digite 1 para continuar ou 0 para voltar ao menu: "),
+    read(Z),
+    Z == 0, !;
+    anotaSintoma(X).
+
 verDiag:-
-  write("Digite o nome do paciente: "),
-  read(X),
-  write("Diagnostico -> "),
-  findall(Y, consulta(X,Y), Z),
-  doenca(K,Z),
-  write(K).
+    write("Digite o nome do paciente: "),
+    read(X),
+    paciente(X),
+    write("Diagnostico -> "),
+    findall(Y, consulta(X,Y), Z),
+    doenca(K,Z),
+    write(K);
+    write("Paciente nao cadastrado!").
 
 %%Printa os valores de uma lista
 printaList([]).
@@ -422,21 +464,32 @@ printaList([X|Y]):-
 
 %% Mostra os dados que estão armazenados no arquivo de texto
 mostraConsultaTxt:-
-    write("Digite o nome do arquivo"),
+    write("Digite o nome do arquivo"), nl,
     read(X),
     open(X, read, Stream),
     ler_do_arquivo(Stream, Lista),
     select('end_of_file', Lista, R),
-    [A, B, C|D] = R,
+    [A|D] = R,
     format('Nome: ~w ', A), nl,
-    format('Idade: ~w ', B), nl,
-    format('Sexo: ~w ', C), nl,nl,
     write("Sintomas: "), nl,
     printaList(D),
-    doenca(Z, D),
+    doenca(Z, D), nl,
     write('Possivel Diagnostico: '),
     write(Z), nl,
     close(Stream).
+
+exportaPaciente:-
+    write("Digite o nome do paciente a ser exportado: "),
+    read(Paciente),
+    paciente(Paciente),
+    write("Digite o nome do arquivo: "),
+    read(X),
+    open(X, write, Stream),
+    concatString(Paciente, Stream), nl(Stream),
+    forall(consulta(Paciente,Y), (concatString(Y,Stream), nl(Stream))),
+    close(Stream);
+    write("Paciente nao cadastrado!").
+
 
 %%Printa todos os sintomas da forma 'Sintoma: febre'
 printSintomas:-
@@ -447,7 +500,7 @@ concatString(X, Stream):-
     string_concat('\'', X, A),
     string_concat(A, '\'', B),
     string_concat(B, '.', S),
-    escreveArq(S, Stream).
+    write(Stream, S).
 
 ler_do_arquivo(Stream, []):-
   at_end_of_stream(Stream), !.
