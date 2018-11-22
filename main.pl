@@ -365,30 +365,53 @@ menu :- write('\n-- Menu Diagnosticos -- \n\n'),
         write('3. Adicionar Sintomas consulta atual'), nl,
         write('4. Mostrar sintomas da consulta atual'), nl,
         write('5. Ver Diagnostico'), nl,
+        write('6. Ver Diagnostico por arquivo txt'), nl,
         write('0. sair'), nl,
         read(Opcao),
         gestorMenu(Opcao).
 
 gestorMenu(Opcao) :- Opcao == 1, printSintomas, menu;
                      Opcao == 2, novaConsulta, menu;
-                     Opcao == 3, anotaSintoma, menu;
-                     Opcao == 4, mostraConsulta, menu;
+                     Opcao == 3, pedeNomePacienteAdicionar, menu;
+                     Opcao == 4, verSintomasAdicionados, menu;
                      Opcao == 5, verDiag, menu;
+                     Opcao == 6, mostraConsultaTxt, menu;
                      Opcao == 0, true.
 
-%% Cria nova consulta, apagando todos os dados do arquivo de texto
+
 novaConsulta:-
-    open('texto.txt', write, Stream),
     write('Digite seu nome: '),
     read(X), nl,
-    write('Digite sua idade: '),
-    read(Y), nl,
-    write('Digite seu sexo: '),
-    read(Z), nl,
-    write(Stream, X), nl(Stream),
-    write(Stream, Y), nl(Stream),
-    write(Stream, Z), nl(Stream),
-    close(Stream).
+    assert(paciente(X)).
+
+verSintomasAdicionados:-
+    write("Digite o nome do paciente: "),
+    read(X),
+    write("Sintomas: "),
+    findall(Y, consulta(X,Y), Z),
+    write(Z).
+
+pedeNomePacienteAdicionar:-
+    write("Digite o nome do paciente: "),
+    read(X),
+    anotaSintoma(X).
+
+anotaSintoma(X):-
+    write("Digite o seu sintoma: "),
+    read(Y),
+    assert(consulta(X,Y)),
+    write("Digite 1 para continuar ou 0 para voltar ao menu: "),
+    read(Z),
+    Z == 0, !;
+    anotaSintoma(X).
+
+verDiag:-
+  write("Digite o nome do paciente: "),
+  read(X),
+  write("Diagnostico -> "),
+  findall(Y, consulta(X,Y), Z),
+  doenca(K,Z),
+  write(K).
 
 %%Printa os valores de uma lista
 printaList([]).
@@ -398,8 +421,10 @@ printaList([X|Y]):-
   printaList(Y).
 
 %% Mostra os dados que estão armazenados no arquivo de texto
-mostraConsulta:-
-    open('texto.txt', read, Stream),
+mostraConsultaTxt:-
+    write("Digite o nome do arquivo"),
+    read(X),
+    open(X, read, Stream),
     ler_do_arquivo(Stream, Lista),
     select('end_of_file', Lista, R),
     [A, B, C|D] = R,
@@ -407,39 +432,22 @@ mostraConsulta:-
     format('Idade: ~w ', B), nl,
     format('Sexo: ~w ', C), nl,nl,
     write("Sintomas: "), nl,
-    printaList(D).
+    printaList(D),
+    doenca(Z, D),
+    write('Possivel Diagnostico: '),
+    write(Z), nl,
+    close(Stream).
 
 %%Printa todos os sintomas da forma 'Sintoma: febre'
 printSintomas:-
     nl,
     forall(sintoma(X), format('Sintoma: ~w ~n', [X])).
 
-%%Adiciona um sintoma ao arquivo de texto
-anotaSintoma :-
-       open('texto.txt', append, Stream),   %%Modifiquei a funcao de
-       write('Digite seu sintoma: '),       %%escrever no arquivo, notei que
-       read(X),                             %%para ser escrito precisa colocar da
-       escreveArq(X, Stream).               %%forma, 'sintoma'.
-                                            %%Depois da modifica��o, � possivel
-escreveArq(X, Stream):-                     %%escrever qualquer sintoma no arquivo
-    write(Stream, X), nl(Stream),           %%porem ainda sem as aspas simples e
-    close(Stream).                          %%ponto final, apenas a String em si.
-
-
-%%Verifica os sintomas cadastrados e diz o Diagnostico final
-verDiag :-
-    exists_file('texto.txt'),
-    open('texto.txt', read, X),
-    ler_do_arquivo(X, Lista),
-    select('end_of_file', Lista, R),
-    [A,B,C | Y] = R,
-    format('Nome: ~w ', A), nl,
-    format('Idade: ~w ', B), nl,
-    format('Sexo: ~w ', C), nl,nl,
-    doenca(Z, Y),
-    write('Possivel Diagnostico: '),
-    write(Z), nl,
-    close(X),!.
+concatString(X, Stream):-
+    string_concat('\'', X, A),
+    string_concat(A, '\'', B),
+    string_concat(B, '.', S),
+    escreveArq(S, Stream).
 
 ler_do_arquivo(Stream, []):-
   at_end_of_stream(Stream), !.
@@ -447,3 +455,7 @@ ler_do_arquivo(Stream, []):-
 ler_do_arquivo(Stream, [X|L]):-
   !, read(Stream, X),
   ler_do_arquivo(Stream, L).
+
+paciente(teste).
+
+consulta(paciente, sintoma).
