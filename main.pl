@@ -318,13 +318,13 @@ doenca('Herpes', A):-
     member('formigamento', A),
     member('erupcoes cutaneas', A),
     member('manchas avermelhadas no corpo', A),
-    member('ulceras', A),!.
+    member('ulcera', A),!.
 
 doenca('Herpes', A):-
     length(A, 3),
     member('erupcoes cutaneas', A),
     member('manchas avermelhadas no corpo', A),
-    member('ulceras', A),!.
+    member('ulcera', A),!.
 
 doenca('Febre Amarela', A):-
     length(A, 9),
@@ -512,3 +512,35 @@ ler_do_arquivo(Stream, [X|L]):-
 paciente(teste).
 
 consulta(paciente, sintoma).
+
+
+%%Execução dos testes unitarios
+
+:- begin_tests(main).
+:- use_module(library(main)).
+
+test(doenca):-
+    doenca('Febre Amarela', ['dor generalizada', 'fadiga', 'febre', 'pouco apetite', 'nausea', 'olhos amarelados', 'pele amarelada']).
+
+test(doenca):-
+    doenca('Sifilis', ['dor generalizada', 'fadiga', 'febre', 'ulcera']).
+
+test(doenca):-
+    doenca('Herpes', ['formigamento', 'erupcoes cutaneas', 'manchas avermelhadas no corpo', 'ulcera']).
+
+test(doenca):-
+    doenca('Bronquite', ['tosse prolongada', 'calafrios', 'febre']).
+
+test(doenca):-
+    doenca('Hanseniase', ['fadiga', 'perda de peso', 'dor generalizada', 'manchas avermelhadas no corpo', 'erupcoes cutaneas']).
+
+test(doenca):-
+    doenca('Ataque Cardiaco', ['dor no peito', 'fadiga', 'tontura', 'azia']).
+
+test(doenca):-
+    doenca('Leptospirose', ['dor generalizada', 'diarreia', 'nausea', 'calafrios', 'fadiga', 'febre']).
+
+test(doenca):-
+    doenca('Rubeola', ['febre', 'manchas avermelhadas no corpo']).
+
+end_tests(main).
