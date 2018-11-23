@@ -398,7 +398,7 @@ verSintomasAdicionados:-
     read(X),
     write("Sintomas: "),
     findall(Y, consulta(X,Y), Z),
-    write(Z).
+    write(Z), nl.
 
 removerPaciente:-
     write("Digite o nome do paciente: "),
@@ -509,10 +509,9 @@ ler_do_arquivo(Stream, [X|L]):-
   !, read(Stream, X),
   ler_do_arquivo(Stream, L).
 
-paciente(teste).
+paciente().
 
 consulta(paciente, sintoma).
-
 
 %%Execução dos testes unitarios
 
